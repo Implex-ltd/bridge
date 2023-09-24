@@ -1,14 +1,3 @@
-# bridge
-
-Make a bridge between tool using websocket protocol.
-
-## Install
-```
-go get -u github.com/Implex-ltd/bridge/bridge
-```
-
-## Example
-```go
 package main
 
 import (
@@ -65,14 +54,3 @@ func main() {
 	time.Sleep(1 * time.Second)
 	client()
 }
-
-/**
-    Expected output:
-        - 2023/09/24 16:01:30 openning..
-        - 2023/09/24 16:01:31 recv: test 1
-        - 2023/09/24 16:01:31 recv: test 2
-        - 2023/09/24 16:01:31 recv: test 3
-        - 2023/09/24 16:01:31 got test #3
- */
-   
-```
