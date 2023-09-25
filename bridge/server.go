@@ -1,6 +1,7 @@
 package bridge
 
 import (
+	"errors"
 	"fmt"
 	"log"
 
@@ -30,7 +31,7 @@ func (S *Server) Serve() error {
 		for {
 			_, msg, err = conn.ReadMessage(msg[:0])
 			if err != nil {
-				if err != fastws.EOF {
+				if !errors.Is(err, fastws.EOF) {
 					log.Println(err)
 				}
 				break
@@ -38,7 +39,12 @@ func (S *Server) Serve() error {
 
 			body := string(msg)
 
-			S.Processor(body)
+			switch body {
+			case "ping":
+				continue
+			default:
+				go S.Processor(body)
+			}
 		}
 	})); err != nil {
 		return err
