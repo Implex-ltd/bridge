@@ -49,18 +49,17 @@ func (C *Client) Heartbeat() error {
 	ticker := time.NewTicker(time.Second * 1)
 	defer ticker.Stop()
 
-	for {
-		select {
-		case <-ticker.C:
-			if _, err := C.Conn.Write([]byte("ping")); err != nil {
-				if err := C.Connect(); err != nil {
-					C.Connected = false
-					return fmt.Errorf("client disconnected, cannot reconnect")
-				}
-				C.Connected = true
+	for range ticker.C {
+		if _, err := C.Conn.Write([]byte("ping")); err != nil {
+			if err := C.Connect(); err != nil {
+				C.Connected = false
+				return fmt.Errorf("client disconnected, cannot reconnect")
 			}
+			C.Connected = true
 		}
 	}
+
+	return nil
 }
 
 func (C *Client) PushData(data string) error {
@@ -88,11 +87,14 @@ func (C *Client) ProcessUnpushed() error {
 	for _, e := range C.ToPush {
 		if err := C.PushData(e); err != nil {
 			notPushed = append(notPushed, e)
-			return err
 		}
 	}
 
 	C.ToPush = notPushed
+
+	if len(notPushed) > 0 {
+		return fmt.Errorf("failed to push some items")
+	}
 
 	return nil
 }
